@@ -34,10 +34,18 @@ az vm list-usage --location malaysiawest -o table --query "[?contains(name.value
 
 ```bash
 az vm create \
---resource-group aitest \
+--resource-group myGroup \
 --name myvm \
 --image Ubuntu2204 \
 --size Standard_NV12ads_A10_v5 \
 --admin-username ubuntu \
 --generate-ssh-keys
+```
+
+4. Open ports
+
+```bash
+az vm open-port -g myGroup -n myvm --ports 22
+az vm open-port -g myGroup -n myvm --ports 80
+az vm open-port -g myGroup -n myvm --ports 443
 ```
