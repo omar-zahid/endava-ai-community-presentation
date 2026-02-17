@@ -1,0 +1,53 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade packages (optional)
+  ansible.builtin.apt:
+    upgrade: dist
+  when: upgrade_packages | bool
+
+- name: Install baseline CLI packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - wget
+      - git
+      - unzip
+      - gnupg
+      - lsb-release
+      - software-properties-common
+      - apt-transport-https
+      - jq
+      - htop
+      - tmux
+      - fzf
+      - ripgrep
+      - fd-find
+      - tree
+      - net-tools
+      - dnsutils
+      - openssh-client
+    state: present
+
+# Optional: create a new user (disabled by default)
+- name: Ensure user exists (optional)
+  ansible.builtin.user:
+    name: "{{ new_username }}"
+    shell: /bin/bash
+    groups: sudo
+    append: true
+    create_home: true
+  when: create_user | bool
+
+- name: Ensure .config exists for target user
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/.config"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  when: ansible_user != "root"

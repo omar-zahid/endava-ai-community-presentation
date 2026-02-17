@@ -34,8 +34,8 @@ az vm list-usage --location malaysiawest -o table --query "[?contains(name.value
 
 ```bash
 az vm create \
---resource-group myGroup \
---name myvm \
+--resource-group aitest \
+--name localllm \
 --image Ubuntu2204 \
 --size Standard_NV12ads_A10_v5 \
 --admin-username ubuntu \

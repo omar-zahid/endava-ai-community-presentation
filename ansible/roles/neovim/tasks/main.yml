@@ -1,0 +1,40 @@
+---
+- name: Add Neovim stable PPA
+  ansible.builtin.apt_repository:
+    repo: ppa:neovim-ppa/stable
+    state: present
+    update_cache: true
+
+- name: Install Neovim + dependencies
+  ansible.builtin.apt:
+    name:
+      - neovim
+      - python3-neovim
+      - lua5.4
+    state: present
+
+- name: Ensure nvim config directory exists
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/.config/nvim"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  become: false
+
+- name: Clone/update Neovim config
+  ansible.builtin.git:
+    repo: "{{ nvim_config_repo }}"
+    dest: "/home/{{ ansible_user }}/.config/nvim"
+    version: "{{ nvim_config_version }}"
+    update: true
+  become: false
+
+- name: Print Neovim version
+  ansible.builtin.command: nvim --version
+  register: nvim_ver
+  changed_when: false
+
+- name: Show Neovim version
+  ansible.builtin.debug:
+    var: nvim_ver.stdout_lines

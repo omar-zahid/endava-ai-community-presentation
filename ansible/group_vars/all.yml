@@ -1,0 +1,11 @@
+---
+upgrade_packages: true
+
+create_user: false
+new_username: ubuntu
+
+nvim_config_repo: "https://github.com/omar-zahid/kickstart.nvim.git"
+nvim_config_version: "main"
+
+enable_ufw: true
+ssh_port: 22

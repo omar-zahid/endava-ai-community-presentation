@@ -1,0 +1,19 @@
+---
+- name: Install UFW
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+  when: enable_ufw | bool
+
+- name: Allow SSH via UFW
+  ansible.builtin.ufw:
+    rule: allow
+    port: "{{ ssh_port }}"
+    proto: tcp
+  when: enable_ufw | bool
+
+- name: Enable UFW (safe)
+  ansible.builtin.ufw:
+    state: enabled
+    policy: deny
+  when: enable_ufw | bool

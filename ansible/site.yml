@@ -1,0 +1,11 @@
+---
+- name: Bootstrap server
+  hosts: servers
+  become: true
+
+  roles:
+    - common
+    - devtools
+    - docker
+    - neovim
+    - security
