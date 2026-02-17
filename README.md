@@ -65,26 +65,39 @@ az vm extension set \
   --version 1.6
 ```
 
-4. Open ports
+4. Nginx
 
-```bash
-az vm open-port -g aitest -n localllm --port 22
-az vm open-port -g aitest -n localllm --port 80
-az vm open-port -g aitest -n localllm --port 443
+```bash /etc/nginx/sites-available/ollama
+server {
+    listen 80;
+    server_name _;
+
+    client_max_body_size 100m;
+
+    location / {
+        proxy_pass http://127.0.0.1:11434;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+
+        # Important for streaming responses
+        proxy_buffering off;
+        proxy_cache off;
+
+        proxy_read_timeout 3600;
+        proxy_send_timeout 3600;
+    }
+}
+
 ```
 
-5. Install Nvidia drivers
+Enable the site
 
 ```bash
-sudo apt update && sudo apt install -y ubuntu-drivers-common
-sudo ubuntu-drivers install
-sudo reboot
+sudo ln -sf /etc/nginx/sites-available/ollama /etc/nginx/sites-enabled/ollama
+sudo rm -f /etc/nginx/sites-enabled/default
 
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
-sudo apt install -y ./cuda-keyring_1.1-1_all.deb
-sudo apt update
-sudo apt -y install cuda-toolkit-12-5
-sudo reboot
+sudo nginx -t
 
-nvidia-smi
+sudo systemctl restart nginx
 ```
