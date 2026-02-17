@@ -68,9 +68,9 @@ az vm extension set \
 4. Open ports
 
 ```bash
-az vm open-port -g myGroup -n myvm --ports 22
-az vm open-port -g myGroup -n myvm --ports 80
-az vm open-port -g myGroup -n myvm --ports 443
+az vm open-port -g aitest -n localllm --port 22
+az vm open-port -g aitest -n localllm --port 80
+az vm open-port -g aitest -n localllm --port 443
 ```
 
 5. Install Nvidia drivers
