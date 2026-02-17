@@ -1,6 +1,8 @@
 ---
 upgrade_packages: true
 
+nodejs_major_version: "22"
+
 create_user: false
 new_username: ubuntu
 
