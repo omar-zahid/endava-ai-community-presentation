@@ -33,13 +33,35 @@ az vm list-usage --location malaysiawest -o table --query "[?contains(name.value
 3. Create the VM
 
 ```bash
+# 1. Create a simple cloud-init to install the compiler the extension needs
+cat <<EOF > cloud-config.txt
+#cloud-config
+package_upgrade: true
+packages:
+  - build-essential
+  - linux-headers-generic
+EOF
+
+# 2. Create the VM with Secure Boot OFF
 az vm create \
---resource-group aitest \
---name localllm \
---image Ubuntu2204 \
---size Standard_NV12ads_A10_v5 \
---admin-username ubuntu \
---generate-ssh-keys
+  --resource-group aitest \
+  --name localllm \
+  --image Ubuntu2204 \
+  --size Standard_NV12ads_A10_v5 \
+  --admin-username ubuntu \
+  --generate-ssh-keys \
+  --security-type TrustedLaunch \
+  --enable-secure-boot false \
+  --enable-vtpm false \
+  --custom-data cloud-config.txt
+
+# 3. Apply the NVIDIA Extension (wait ~2 mins for cloud-init to finish first)
+az vm extension set \
+  --resource-group aitest \
+  --vm-name localllm \
+  --name NvidiaGpuDriverLinux \
+  --publisher Microsoft.HpcCompute \
+  --version 1.6
 ```
 
 4. Open ports
