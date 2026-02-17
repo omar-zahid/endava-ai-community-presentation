@@ -1,17 +1,65 @@
 ---
-- name: Add Neovim stable PPA
-  ansible.builtin.apt_repository:
-    repo: ppa:neovim-ppa/stable
-    state: present
-    update_cache: true
+- name: Set Neovim version
+  ansible.builtin.set_fact:
+    nvim_version: "v0.11.1"
 
-- name: Install Neovim + dependencies
+- name: Map architecture to Neovim release artifact
+  ansible.builtin.set_fact:
+    nvim_arch: >-
+      {{
+        'x86_64' if ansible_architecture in ['x86_64', 'amd64']
+        else 'arm64' if ansible_architecture in ['aarch64', 'arm64']
+        else ansible_architecture
+      }}
+
+- name: Fail if unsupported architecture
+  ansible.builtin.fail:
+    msg: "Unsupported architecture for Neovim tarball: {{ ansible_architecture }} (mapped to {{ nvim_arch }})"
+  when: nvim_arch not in ['x86_64', 'arm64']
+
+- name: Remove old neovim from apt (if installed)
   ansible.builtin.apt:
-    name:
-      - neovim
-      - python3-neovim
-      - lua5.4
-    state: present
+    name: neovim
+    state: absent
+  ignore_errors: true
+
+- name: Download Neovim {{ nvim_version }} tarball
+  ansible.builtin.get_url:
+    url: "https://github.com/neovim/neovim/releases/download/{{ nvim_version }}/nvim-linux-{{ nvim_arch }}.tar.gz"
+    dest: "/tmp/nvim-linux-{{ nvim_arch }}.tar.gz"
+    mode: "0644"
+
+- name: Remove old nvim install dir
+  ansible.builtin.file:
+    path: /opt/nvim
+    state: absent
+
+- name: Extract Neovim to /opt
+  ansible.builtin.unarchive:
+    src: "/tmp/nvim-linux-{{ nvim_arch }}.tar.gz"
+    dest: /opt
+    remote_src: true
+
+- name: Rename extracted folder to /opt/nvim
+  ansible.builtin.command: "mv /opt/nvim-linux-{{ nvim_arch }} /opt/nvim"
+  args:
+    creates: /opt/nvim
+
+- name: Symlink nvim to /usr/local/bin/nvim
+  ansible.builtin.file:
+    src: /opt/nvim/bin/nvim
+    dest: /usr/local/bin/nvim
+    state: link
+    force: true
+
+- name: Verify Neovim version
+  ansible.builtin.command: nvim --version
+  register: nvim_ver
+  changed_when: false
+
+- name: Show Neovim version
+  ansible.builtin.debug:
+    var: nvim_ver.stdout_lines
 
 - name: Ensure nvim config directory exists
   ansible.builtin.file:
@@ -22,19 +70,9 @@
     mode: "0755"
   become: false
 
-- name: Clone/update Neovim config
+- name: Clone/update Neovim config (default branch)
   ansible.builtin.git:
     repo: "{{ nvim_config_repo }}"
     dest: "/home/{{ ansible_user }}/.config/nvim"
-    version: "{{ nvim_config_version }}"
     update: true
   become: false
-
-- name: Print Neovim version
-  ansible.builtin.command: nvim --version
-  register: nvim_ver
-  changed_when: false
-
-- name: Show Neovim version
-  ansible.builtin.debug:
-    var: nvim_ver.stdout_lines

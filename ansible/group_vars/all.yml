@@ -5,7 +5,7 @@ create_user: false
 new_username: ubuntu
 
 nvim_config_repo: "https://github.com/omar-zahid/kickstart.nvim.git"
-nvim_config_version: "main"
+nvim_config_version: "master"
 
 enable_ufw: true
 ssh_port: 22
