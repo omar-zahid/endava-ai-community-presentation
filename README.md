@@ -49,3 +49,19 @@ az vm open-port -g myGroup -n myvm --ports 22
 az vm open-port -g myGroup -n myvm --ports 80
 az vm open-port -g myGroup -n myvm --ports 443
 ```
+
+5. Install Nvidia drivers
+
+```bash
+sudo apt update && sudo apt install -y ubuntu-drivers-common
+sudo ubuntu-drivers install
+sudo reboot
+
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+sudo apt install -y ./cuda-keyring_1.1-1_all.deb
+sudo apt update
+sudo apt -y install cuda-toolkit-12-5
+sudo reboot
+
+nvidia-smi
+```
