@@ -1,4 +1,16 @@
 ---
+- name: Recover from interrupted dpkg (if any)
+  ansible.builtin.command: dpkg --configure -a
+  register: dpkg_fix
+  failed_when: false
+  changed_when: false
+
+- name: Fix broken dependencies (apt-get -f install)
+  ansible.builtin.command: apt-get -y -f install
+  register: apt_fix
+  failed_when: false
+  changed_when: false
+
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: true

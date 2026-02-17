@@ -53,6 +53,7 @@ az vm create \
   --security-type TrustedLaunch \
   --enable-secure-boot false \
   --enable-vtpm false \
+  --os-disk-size-gb 512 \
   --custom-data cloud-config.txt
 
 # 3. Apply the NVIDIA Extension (wait ~2 mins for cloud-init to finish first)
