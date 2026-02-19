@@ -3,7 +3,7 @@
 1. Create new resource group
 
 ```bash
-az group create --name myGroup --location malaysiawest
+az group create --name aicommunity --location malaysiawest
 
 ```
 2. List available images and SKUs
@@ -44,8 +44,8 @@ EOF
 
 # 2. Create the VM with Secure Boot OFF
 az vm create \
-  --resource-group aitest \
-  --name localllm \
+  --resource-group aicommunity \
+  --name llm \
   --image Ubuntu2204 \
   --size Standard_NV12ads_A10_v5 \
   --admin-username ubuntu \
@@ -58,15 +58,15 @@ az vm create \
 
 # 3. Apply the NVIDIA Extension
 az vm extension set \
-  --resource-group aitest \
-  --vm-name localllm \
+  --resource-group aicommunity \
+  --vm-name llm \
   --name NvidiaGpuDriverLinux \
   --publisher Microsoft.HpcCompute \
   --version 1.6
 
 #4. Open ports
-az vm open-port -g aitest -n localllm --port 80 --priority 4000
-az vm open-port -g aitest -n localllm --port 443 --priority 4001
+az vm open-port -g aicommunity -n llm --port 80 --priority 4000
+az vm open-port -g aicommunity -n llm --port 443 --priority 4001
 
 ```
 
