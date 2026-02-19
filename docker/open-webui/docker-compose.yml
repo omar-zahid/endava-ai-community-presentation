@@ -1,0 +1,43 @@
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+    environment:
+      OLLAMA_BASE_URL: "http://host.docker.internal:11434"
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - open-webui:/app/backend/data
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    networks:
+      - proxy
+      - defaultbridge
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.openwebui.entrypoints=http"
+      - "traefik.http.routers.openwebui.rule=Host(`chat.ai.magnusreactor.com`)"
+      - "traefik.http.middlewares.openwebui-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.openwebui.middlewares=openwebui-https-redirect"
+      - "traefik.http.routers.openwebui-secure.entrypoints=https"
+      - "traefik.http.routers.openwebui-secure.rule=Host(`chat.ai.magnusreactor.com`)"
+      - "traefik.http.routers.openwebui-secure.tls=true"
+      - "traefik.http.routers.openwebui-secure.service=openwebui"
+      - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
+      - "traefik.docker.network=proxy"
+
+volumes:
+  open-webui:
+
+networks:
+  proxy:
+    external: true
+  defaultbridge:
+    driver: bridge

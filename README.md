@@ -63,41 +63,43 @@ az vm extension set \
   --name NvidiaGpuDriverLinux \
   --publisher Microsoft.HpcCompute \
   --version 1.6
-```
 
-4. Nginx
-
-```bash /etc/nginx/sites-available/ollama
-server {
-    listen 80;
-    server_name _;
-
-    client_max_body_size 100m;
-
-    location / {
-        proxy_pass http://127.0.0.1:11434;
-
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-
-        # Important for streaming responses
-        proxy_buffering off;
-        proxy_cache off;
-
-        proxy_read_timeout 3600;
-        proxy_send_timeout 3600;
-    }
-}
+#4. Open ports
+az vm open-port -g aitest -n localllm --port 80 --priority 4000
+az vm open-port -g aitest -n localllm --port 443 --priority 4001
 
 ```
 
-Enable the site
+4. Install Ollma
 
-```bash
-sudo ln -sf /etc/nginx/sites-available/ollama /etc/nginx/sites-enabled/ollama
-sudo rm -f /etc/nginx/sites-enabled/default
+After installation, edit ollama
 
-sudo nginx -t
+```
+sudo systemctl edit ollama.service --full --force
+```
 
-sudo systemctl restart nginx
+Add or modify the Environment variable under the [Service] section:
+ini
+```
+[Service]
+Environment="OLLAMA_HOST=0.0.0.0:11434"
+```
+
+Reload
+```
+sudo systemctl daemon-reload
+sudo systemctl restart ollama
+```
+
+
+
+```test
+ubuntu@localllm:~/code$ ollama run qwen3-coder:30b
+>>> hello
+Hello! How can I help you today?
+
+>>> what model are you?
+I am Claude, a large language model created by Anthropic. I'm designed to be helpful, harmless,
+and honest in my interactions. Is there something specific you'd like to know or discuss?
+
 ```
