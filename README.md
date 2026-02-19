@@ -56,7 +56,7 @@ az vm create \
   --os-disk-size-gb 512 \
   --custom-data cloud-config.txt
 
-# 3. Apply the NVIDIA Extension (wait ~2 mins for cloud-init to finish first)
+# 3. Apply the NVIDIA Extension
 az vm extension set \
   --resource-group aitest \
   --vm-name localllm \
@@ -72,8 +72,11 @@ az vm open-port -g aitest -n localllm --port 443 --priority 4001
 
 4. Install Ollma
 
-After installation, edit ollama
+```
+curl -fsSL https://ollama.com/install.sh | sh
+```
 
+After installation, edit ollama
 ```
 sudo systemctl edit ollama.service --full --force
 ```
@@ -101,5 +104,4 @@ Hello! How can I help you today?
 >>> what model are you?
 I am Claude, a large language model created by Anthropic. I'm designed to be helpful, harmless,
 and honest in my interactions. Is there something specific you'd like to know or discuss?
-
 ```
