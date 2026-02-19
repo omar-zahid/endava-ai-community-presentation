@@ -89,3 +89,26 @@ docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
 6. Deploy Traefik + Open WebUI + Ollama (Dockerized)
 
 Follow `docker/README.md` for the full runbook.
+
+7. Opencode installation
+
+```~/.config/opencode/opencode.json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "ollama-local": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen3-coder:30b": {
+          "name": "Qwen3 Coder 30B"
+        }
+      }
+    }
+  }
+}
+
+```
