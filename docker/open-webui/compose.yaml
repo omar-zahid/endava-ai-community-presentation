@@ -1,25 +1,49 @@
 services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ollama:/root/.ollama
+    networks:
+      - proxy
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   openwebui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    depends_on:
+      ollama:
+        condition: service_healthy
 
     environment:
-      OLLAMA_BASE_URL: "http://host.docker.internal:11434"
+      OLLAMA_BASE_URL: "http://ollama:11434"
 
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - open-webui:/app/backend/data
 
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
     networks:
       - proxy
-      - defaultbridge
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.openwebui.entrypoints=http"
@@ -35,9 +59,8 @@ services:
 
 volumes:
   open-webui:
+  ollama:
 
 networks:
   proxy:
     external: true
-  defaultbridge:
-    driver: bridge

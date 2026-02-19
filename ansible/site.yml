@@ -8,5 +8,6 @@
     - devtools
     - nodejs
     - docker
+    - nvidia_container_toolkit
     - neovim
     - security

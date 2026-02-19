@@ -11,3 +11,5 @@ nvim_config_version: "master"
 
 enable_ufw: true
 ssh_port: 22
+
+enable_nvidia_container_toolkit: true
