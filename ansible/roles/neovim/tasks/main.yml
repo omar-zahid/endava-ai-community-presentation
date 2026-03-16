@@ -73,6 +73,7 @@
 - name: Clone/update Neovim config (default branch)
   ansible.builtin.git:
     repo: "{{ nvim_config_repo }}"
+    version: "{{ nvim_config_version }}"
     dest: "/home/{{ ansible_user }}/.config/nvim"
     update: true
   become: false
