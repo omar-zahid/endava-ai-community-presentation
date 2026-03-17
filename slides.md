@@ -12,6 +12,10 @@ Here's the plan for today:
 8. Production deployment - HTTPS, SSL
 9. Tips - Strategies for developing with LLMs
 
+- [GitHub](https://github.com/omar-zahid/endava-ai-community-presentation)
+
+
+
 ---
 
 ## Demo
